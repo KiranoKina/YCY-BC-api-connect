@@ -10,7 +10,6 @@
 // @grant        GM_xmlhttpRequest
 // @connect      suo.jiushu1234.com
 // @connect      cdn.jsdelivr.net
-// @require      https://cdn.jsdelivr.net/npm/bondage-club-mod-sdk@1.2.0/dist/bcmodsdk.js
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -32,19 +31,47 @@
     stop: "_stop_all"
   };
 
-  const modApi = window.bcModSdk.registerMod({
-    name: MOD_NAME,
-    fullName: "YCY BC Estim Link",
-    version: MOD_VERSION,
-    repository: ""
-  }, { allowReplace: true });
-
+  let modApi = null;
   let chat = null;
   let sdkTask = null;
   let loginInfo = null;
   let lastToySignature = "";
   let inputElement = null;
   const cooldowns = new Map();
+
+  function initModApi() {
+    if (modApi) return modApi;
+    try {
+      if (window.bcModSdk?.registerMod) {
+        modApi = window.bcModSdk.registerMod({
+          name: MOD_NAME,
+          fullName: "YCY BC Estim Link",
+          version: MOD_VERSION,
+          repository: ""
+        }, { allowReplace: true });
+      }
+    } catch (error) {
+      console.warn("[YCY] bcModSdk unavailable", error);
+    }
+    return modApi;
+  }
+
+  function hookFunction(name, priority, handler) {
+    const api = initModApi();
+    if (api?.hookFunction) {
+      api.hookFunction(name, priority, handler);
+      return true;
+    }
+    const original = window[name];
+    if (typeof original !== "function") return false;
+    if (original.__ycyWrapped) return true;
+    const wrapped = function (...args) {
+      return handler(args, nextArgs => original.apply(this, nextArgs));
+    };
+    wrapped.__ycyWrapped = true;
+    window[name] = wrapped;
+    return true;
+  }
 
   function storeGet(key, fallback) {
     const raw = localStorage.getItem(STORE_PREFIX + key);
@@ -456,7 +483,7 @@
 
   function hookCommands() {
     if (typeof window.ChatRoomCommand === "function") {
-      modApi.hookFunction("ChatRoomCommand", 100, (args, next) => {
+      hookFunction("ChatRoomCommand", 100, (args, next) => {
         const text = commandFromChatRoomCommandArgs(args);
         if (!text) return next(args);
         runCommand(text).catch(error => local(`YCY：${error.message || error}`));
@@ -464,14 +491,14 @@
         return true;
       });
     }
-    modApi.hookFunction("ChatRoomSendChat", 10, (args, next) => {
+    hookFunction("ChatRoomSendChat", 10, (args, next) => {
       const text = inputText().trim();
       if (!commandPrefix(text)) return next(args);
       runCommand(text).catch(error => local(`YCY：${error.message || error}`));
       markCommandSent(text);
       return;
     });
-    modApi.hookFunction("ChatRoomKeyDown", 10, (args, next) => {
+    hookFunction("ChatRoomKeyDown", 10, (args, next) => {
       const event = args[0];
       const text = inputText().trim();
       if (event?.key === "Enter" && commandPrefix(text)) {
@@ -483,12 +510,12 @@
       }
       return next(args);
     });
-    modApi.hookFunction("ChatRoomCreateElement", 0, (args, next) => {
+    hookFunction("ChatRoomCreateElement", 0, (args, next) => {
       const result = next(args);
       inputElement = input();
       return result;
     });
-    modApi.hookFunction("ChatRoomClearAllElements", 0, (args, next) => {
+    hookFunction("ChatRoomClearAllElements", 0, (args, next) => {
       inputElement = null;
       return next(args);
     });
@@ -540,7 +567,7 @@
   }
 
   function hookMessages() {
-    modApi.hookFunction("ChatRoomMessage", 9, (args, next) => {
+    hookFunction("ChatRoomMessage", 9, (args, next) => {
       const data = args[0];
       handleMessage(data).catch(error => console.warn(MOD_NAME, error));
       return next(args);
@@ -584,7 +611,7 @@
   }
 
   function hookToySync() {
-    modApi.hookFunction("CharacterRefresh", 0, (args, next) => {
+    hookFunction("CharacterRefresh", 0, (args, next) => {
       const result = next(args);
       if (args[0] === Player) scheduleToySync("CharacterRefresh");
       return result;
@@ -608,7 +635,7 @@
 
   function wait() {
     const timer = setInterval(() => {
-      if (typeof window.Player !== "undefined" && typeof window.ChatRoomSendChat === "function") {
+      if (typeof window.Player !== "undefined") {
         clearInterval(timer);
         load();
       }
