@@ -142,7 +142,7 @@
     if (loadedMessageShown) return;
     if (W.CurrentScreen !== "ChatRoom") return;
     loadedMessageShown = true;
-    localHtml(`<font color="Black">[YCY] 电击器联动工具 v0.1.0 载入！ 使用 /ycy help 查看说明</font>`, 60000);
+    localHtml(`<font color="Black">[YCY Link] 已就绪 v0.1.0<br>输入 /ycy help 打开联动说明。</font>`, 60000);
   }
 
   function scheduleLoadMessage() {
