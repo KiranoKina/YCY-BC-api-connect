@@ -17,6 +17,7 @@
 // @match        *://bondage-asia.com/*
 // @match        *://www.bondage-asia.com/club/R*/*
 // @match        *://bondage-asia.com/club/R*/*
+// @include      /^https:\/\/(www\.)?bondage(projects\.elementfx|-(europe|asia))\.com\/.*/
 // @grant        GM_xmlhttpRequest
 // @connect      suo.jiushu1234.com
 // @connect      cdn.jsdelivr.net
