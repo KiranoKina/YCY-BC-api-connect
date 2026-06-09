@@ -4,8 +4,19 @@
 // @version      0.1.0
 // @description  将 Bondage Club 事件转换为弹次元 Tencent IM game_cmd 指令
 // @author       You
-// @match        https://www.bondageprojects.com/club_game/*
-// @match        https://bondageprojects.elementfx.com/club_game/*
+// @match        *://www.bondageprojects.com/club_game*
+// @match        *://www.bondageprojects.elementfx.com/*
+// @match        *://bondageprojects.elementfx.com/*
+// @match        *://www.bondageprojects.elementfx.com/R*/BondageClub/*
+// @match        *://bondageprojects.elementfx.com/R*/BondageClub/*
+// @match        *://www.bondage-europe.com/*
+// @match        *://bondage-europe.com/*
+// @match        *://www.bondage-europe.com/R*/BondageClub/*
+// @match        *://bondage-europe.com/R*/BondageClub/*
+// @match        *://www.bondage-asia.com/*
+// @match        *://bondage-asia.com/*
+// @match        *://www.bondage-asia.com/club/R*/*
+// @match        *://bondage-asia.com/club/R*/*
 // @grant        GM_xmlhttpRequest
 // @connect      suo.jiushu1234.com
 // @connect      cdn.jsdelivr.net
