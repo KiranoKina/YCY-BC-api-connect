@@ -6,6 +6,7 @@
 // @author       You
 // @match        https://www.bondageprojects.com/club_game/*
 // @match        https://bondageprojects.elementfx.com/club_game/*
+// @include      /^https:\/\/(www\.)?bondage(projects\.elementfx|-(europe|asia))\.com\/.*/
 // @grant        GM_xmlhttpRequest
 // @connect      suo.jiushu1234.com
 // @connect      cdn.jsdelivr.net
